@@ -1,9 +1,9 @@
 
 ## Preview Of Postgres Monitoring Dashboard
-![Preview Postgres Monitoring Dashboard.](https://github.com/dimaspriyo/grafana-postgres-redis-monitoring/screenshoots/postgres-dashboard.png)
+![Preview Postgres Monitoring Dashboard.](https://github.com/dimaspriyo/grafana-postgres-redis-monitoring/blob/main/screenshoots/postgres-dashboard.png)
 
 ## Preview Of Redis Monitoring Dashboard
-![Preview Redis Monitoring Dashboard.](https://github.com/dimaspriyo/grafana-postgres-redis-monitoring/screenshoots/redis-dashboard.png)
+![Preview Redis Monitoring Dashboard.](https://github.com/dimaspriyo/grafana-postgres-redis-monitoring/blob/main/screenshoots/redis-dashboard.png)
 
 
 ## How To
