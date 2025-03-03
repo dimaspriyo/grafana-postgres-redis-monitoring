@@ -1,0 +1,92 @@
+version: '3.8'
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  postgres_data: {}
+  prometheus_data: {}
+  grafana_data: {}
+  exporter_config: {}  # Ensure volume exists
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: pagila_db
+    ports:
+      - "5432:5432"
+    networks:
+      - monitoring
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - monitoring
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:root@postgres:5432/pagila_db?sslmode=disable"
+    volumes:
+      - ./postgres_exporter.yml:/etc/postgres_exporter/postgres_exporter.yml
+    command:
+      - '--config.file=/etc/postgres_exporter/postgres_exporter.yml'
+    ports:
+      - "9187:9187"
+    networks:
+      - monitoring
+    depends_on:
+      - postgres
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    container_name: redis-exporter
+    environment:
+      REDIS_ADDR: "redis:6379"
+    ports:
+      - "9121:9121"
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/dashboard/default:/etc/grafana/provisioning/dashboards
+      - ./provisioning/dashboard/imported:/var/lib/grafana/dashboards

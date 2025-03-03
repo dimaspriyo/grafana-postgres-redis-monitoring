@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+databases:
+  - name: mydb
+    dsn: postgresql://admin:password@postgres:5432/mydb?sslmode=disable
